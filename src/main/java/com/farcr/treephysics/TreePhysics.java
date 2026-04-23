@@ -1,6 +1,6 @@
-package com.farcr;
+package com.farcr.treephysics;
 
-import com.farcr.event.CommonEvents;
+import com.farcr.treephysics.event.CommonEvents;
 import com.mojang.logging.LogUtils;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModContainer;
