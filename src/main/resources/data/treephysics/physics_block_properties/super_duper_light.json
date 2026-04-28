@@ -1,0 +1,8 @@
+{
+  "priority": 2000,
+  "selector": "#treephysics:super_duper_light",
+
+  "properties": {
+    "sable:mass": 0.0625
+  }
+}
