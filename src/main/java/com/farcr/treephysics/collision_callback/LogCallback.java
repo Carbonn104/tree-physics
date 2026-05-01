@@ -1,6 +1,7 @@
 package com.farcr.treephysics.collision_callback;
 
 import com.farcr.treephysics.client.TreeManager;
+import com.farcr.treephysics.index.TreePhysicsTags;
 import com.farcr.treephysics.particle.collision_dust.CollisionDustParticleOptions;
 import dev.ryanhcode.sable.physics.callback.FragileBlockCallback;
 import dev.ryanhcode.sable.sublevel.SubLevel;
@@ -58,7 +59,7 @@ public class LogCallback extends FragileBlockCallback {
                 }
             }
 
-            if(dustState != null) {
+            if(dustState != null && dustState.is(TreePhysicsTags.PRODUCES_DUST_ON_IMPACT)) {
                 level.sendParticles(new CollisionDustParticleOptions(dustState), hitPos.x, hitPos.y, hitPos.z, 3, 0, 0, 0, 1);
             }
         }
