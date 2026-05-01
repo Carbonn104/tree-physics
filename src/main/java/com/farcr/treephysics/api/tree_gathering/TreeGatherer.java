@@ -25,27 +25,18 @@ public class TreeGatherer {
             return null;
         }
 
-        List<Collection<BlockPos>> toSplit = new ArrayList<>();
+        List<ServerSubLevel> subLevels = new ArrayList<>();
+        TreeServerHandler handler = TreeServerHandler.get(level);
 
-        Set<BlockPos> willSplit = new HashSet<>();
         for (BlockPos offset : TreeUtil.DIRECTION_OFFSETS_CORNERS) {
             BlockPos start = brokenPos.offset(offset);
-            if(willSplit.contains(start)) continue;
 
             Tree tree = gatherTree(level, start, TreeUtil::treeSpread, TreeUtil.DIRECTION_OFFSETS_CORNERS, brokenPos);
             if(tree != null && !tree.hasRoot()) {
-                toSplit.add(tree.blocks());
-                willSplit.addAll(tree.blocks());
+                ServerSubLevel serverSubLevel = SubLevelAssemblyHelper.assembleBlocks(level, brokenPos, tree.blocks(), new BoundingBox3i(brokenPos, brokenPos));
+                subLevels.add(serverSubLevel);
+                handler.setTree(serverSubLevel);
             }
-        }
-
-        List<ServerSubLevel> subLevels = new ArrayList<>();
-
-        for (Collection<BlockPos> blocks : toSplit) {
-            ServerSubLevel serverSubLevel = SubLevelAssemblyHelper.assembleBlocks(level, brokenPos, blocks, new BoundingBox3i(brokenPos, brokenPos));
-            subLevels.add(serverSubLevel);
-            TreeServerHandler handler = TreeServerHandler.get(level);
-            handler.setTree(serverSubLevel);
         }
 
         return subLevels;
