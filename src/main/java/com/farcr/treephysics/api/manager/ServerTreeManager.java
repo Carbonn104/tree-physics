@@ -1,5 +1,6 @@
 package com.farcr.treephysics.api.manager;
 
+import com.farcr.treephysics.api.TreeUtil;
 import com.farcr.treephysics.client.TreeManager;
 import com.farcr.treephysics.index.TreePhysicsConfig;
 import com.farcr.treephysics.networking.UpdateClientTrees;
@@ -54,11 +55,8 @@ public class ServerTreeManager extends SavedData implements TreeManager {
             if(gravityTicks == -1 || tree.lifeTicks <= gravityTicks) {
                 Vector3d gravity = DimensionPhysicsData.getGravity(level);
 
-                Vector3d dir = subLevel.logicalPose().transformNormal(new Vector3d(0, 1, 0));
-                double gravityScale = 1.0 -  Math.max(0, dir.dot(0, 1, 0));
-
-                gravityScale *= Math.max(0.0, TreePhysicsConfig.GRAVITY_MULTIPLIER.getAsDouble() - 1.0);
-
+                double gravityScale = TreeUtil.getUprightness(subLevel);
+                gravityScale *= 1.0 - Math.max(0.0, TreePhysicsConfig.GRAVITY_MULTIPLIER.getAsDouble() - 1.0);
 
                 RigidBodyHandle handle = system.getPhysicsHandle(subLevel);
                 handle.addLinearAndAngularVelocity(gravity.mul(timeStep * gravityScale), JOMLConversion.ZERO);

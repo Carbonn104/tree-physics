@@ -7,6 +7,7 @@
     "collision_effects.BlockWithSubLevelCallbackMixin",
     "collision_effects.LeavesBlockMixin",
     "rooted_dirt_placement.TrunkPlacerMixin",
+    "tree_pushing.ServerboundPunchSubLevelPacketMixin",
     "tree_splitting.SubLevelAssemblyHelperMixin"
   ],
   "client": [

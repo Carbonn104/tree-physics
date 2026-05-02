@@ -13,6 +13,7 @@ public class TreePhysicsConfig {
     public static final ModConfigSpec.IntValue GRAVITY_MULTIPLIER_TICKS;
     public static final ModConfigSpec.DoubleValue IMPULSE_FORCE;
     public static final ModConfigSpec.DoubleValue IMPULSE_TORQUE;
+    public static final ModConfigSpec.DoubleValue EXTRA_PUSH_MULTIPLIER;
 
     static {
         ModConfigSpec.Builder builder = new ModConfigSpec.Builder();
@@ -50,6 +51,10 @@ public class TreePhysicsConfig {
         IMPULSE_TORQUE = builder
                 .comment("How much torque should be applied to trees when chopped down")
                 .defineInRange("impulse_torque", 0.3, 0.0, Double.MAX_VALUE);
+
+        EXTRA_PUSH_MULTIPLIER = builder
+                .comment("How much extra pushing strength should be applied for upright trees")
+                .defineInRange("extra_push_multiplier", 2.0, 0.0, Double.MAX_VALUE);
 
         builder.pop();
 
