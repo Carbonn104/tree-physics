@@ -55,8 +55,8 @@ public class ServerTreeManager extends SavedData implements TreeManager {
             if(gravityTicks == -1 || tree.lifeTicks <= gravityTicks) {
                 Vector3d gravity = DimensionPhysicsData.getGravity(level);
 
-                double gravityScale = TreeUtil.getUprightness(subLevel);
-                gravityScale *= 1.0 - Math.max(0.0, TreePhysicsConfig.GRAVITY_MULTIPLIER.getAsDouble() - 1.0);
+                double gravityScale = 1.0 - TreeUtil.getUprightness(subLevel);
+                gravityScale *= TreePhysicsConfig.GRAVITY_MULTIPLIER.getAsDouble();
 
                 RigidBodyHandle handle = system.getPhysicsHandle(subLevel);
                 handle.addLinearAndAngularVelocity(gravity.mul(timeStep * gravityScale), JOMLConversion.ZERO);
