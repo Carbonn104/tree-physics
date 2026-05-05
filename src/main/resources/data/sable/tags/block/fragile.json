@@ -1,0 +1,6 @@
+{
+  "values": [
+    { "id": "nomansland:apple", "required": false },
+    { "id": "nomansland:pear", "required": false }
+  ]
+}

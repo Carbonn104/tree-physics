@@ -2,6 +2,7 @@ package com.farcr.treephysics.api.tree_gathering;
 
 import com.farcr.treephysics.api.TreeUtil;
 import com.farcr.treephysics.api.manager.ServerTreeManager;
+import com.farcr.treephysics.index.TreePhysicsTags;
 import dev.ryanhcode.sable.api.SubLevelAssemblyHelper;
 import dev.ryanhcode.sable.companion.math.BoundingBox3i;
 import dev.ryanhcode.sable.sublevel.ServerSubLevel;
@@ -36,6 +37,10 @@ public class TreeGatherer {
                 ServerSubLevel serverSubLevel = SubLevelAssemblyHelper.assembleBlocks(level, brokenPos, tree.blocks(), new BoundingBox3i(brokenPos, brokenPos));
                 subLevels.add(serverSubLevel);
                 handler.setTree(serverSubLevel);
+
+                for (BlockPos pos : tree.fallingBlocks()) {
+                    SubLevelAssemblyHelper.assembleBlocks(level, pos, List.of(pos), new BoundingBox3i(pos, pos));
+                }
             }
         }
 
@@ -63,7 +68,8 @@ public class TreeGatherer {
 
         boolean hasRoots = false;
         Set<Long> visited = new LongOpenHashSet();
-        Set<BlockPos> result = new HashSet<>();
+        Set<BlockPos> treeBlocks = new HashSet<>();
+        Set<BlockPos> fallingBlocks = new HashSet<>();
         Queue<BlockPos> queue = new LinkedList<>();
 
         queue.add(root);
@@ -73,7 +79,7 @@ public class TreeGatherer {
             BlockPos centerPos = queue.poll();
             BlockState centerState = blockGetter.getBlockState(centerPos);
             visited.add(centerPos.asLong());
-            result.add(centerPos);
+            treeBlocks.add(centerPos);
 
             if(!hasRoots && blockGetter.getBlockState(centerPos.below()).is(Blocks.ROOTED_DIRT)) {
                 hasRoots = true;
@@ -93,7 +99,10 @@ public class TreeGatherer {
                 }
 
                 if(!nextPos.equals(ignore)) {
-                    if(predicate.test(centerState, nextState, context)) {
+                    if(nextState.is(TreePhysicsTags.FALLS_FROM_TREES)) {
+                        visited.add(nextLong);
+                        fallingBlocks.add(nextPos);
+                    } else if(predicate.test(centerState, nextState, context)) {
                         visited.add(nextLong);
                         queue.add(nextPos);
                     }
@@ -103,7 +112,7 @@ public class TreeGatherer {
             count++;
         }
 
-        return new Tree(result, hasRoots);
+        return new Tree(treeBlocks, fallingBlocks, hasRoots);
     }
 
 }

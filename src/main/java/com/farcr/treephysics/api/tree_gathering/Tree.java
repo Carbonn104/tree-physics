@@ -4,5 +4,5 @@ import net.minecraft.core.BlockPos;
 
 import java.util.Collection;
 
-public record Tree(Collection<BlockPos> blocks, boolean hasRoot) {
+public record Tree(Collection<BlockPos> blocks, Collection<BlockPos> fallingBlocks, boolean hasRoot) {
 }

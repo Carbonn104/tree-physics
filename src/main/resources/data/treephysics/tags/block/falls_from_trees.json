@@ -1,0 +1,7 @@
+{
+  "values": [
+    "minecraft:bee_nest",
+    { "id": "nomansland:apple", "required": false },
+    { "id": "nomansland:pear", "required": false }
+  ]
+}
