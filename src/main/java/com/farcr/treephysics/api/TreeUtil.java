@@ -145,4 +145,8 @@ public class TreeUtil {
         return !fromState.is(TreePhysicsTags.FALLS_FROM_TREES) && toState.is(TreePhysicsTags.FALLS_FROM_TREES);
     }
 
+    public static boolean isRoot(BlockState state) {
+        return state.is(TreePhysicsTags.ROOTS);
+    }
+
 }

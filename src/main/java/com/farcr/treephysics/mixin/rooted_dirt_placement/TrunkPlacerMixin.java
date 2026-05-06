@@ -26,9 +26,4 @@ public class TrunkPlacerMixin {
         }
     }
 
-//    @WrapOperation(method = "setDirtAt", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/levelgen/feature/stateproviders/BlockStateProvider;getState(Lnet/minecraft/util/RandomSource;Lnet/minecraft/core/BlockPos;)Lnet/minecraft/world/level/block/state/BlockState;"))
-//    private static BlockState treephysics$setDirtAt(BlockStateProvider instance, RandomSource randomSource, BlockPos blockPos, Operation<BlockState> original) {
-//        return Blocks.ROOTED_DIRT.defaultBlockState();
-//    }
-
 }

@@ -11,7 +11,6 @@ import dev.ryanhcode.sable.api.physics.PhysicsPipeline;
 import dev.ryanhcode.sable.api.physics.handle.RigidBodyHandle;
 import dev.ryanhcode.sable.api.sublevel.ServerSubLevelContainer;
 import dev.ryanhcode.sable.api.sublevel.SubLevelContainer;
-import dev.ryanhcode.sable.companion.math.BoundingBox3ic;
 import dev.ryanhcode.sable.companion.math.JOMLConversion;
 import dev.ryanhcode.sable.sublevel.ServerSubLevel;
 import dev.ryanhcode.sable.sublevel.SubLevel;
@@ -30,14 +29,17 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.LevelSimulatedReader;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.RotatedPillarBlock;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.levelgen.feature.treedecorators.TreeDecorator;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 import net.neoforged.neoforge.event.entity.player.UseItemOnBlockEvent;
+import net.neoforged.neoforge.event.level.AlterGroundEvent;
 import net.neoforged.neoforge.event.level.BlockEvent;
 import org.joml.Vector3d;
 
@@ -143,6 +145,23 @@ public class CommonEvents {
             }
         }
     }
+
+    // will need to just mixin to AlterGroundDecorator when porting to multiloader for this
+    @SubscribeEvent
+    public static void alterGround(AlterGroundEvent event) {
+        TreeDecorator.Context context = event.getContext();
+        LevelSimulatedReader reader = context.level();
+
+        AlterGroundEvent.StateProvider provider = event.getStateProvider();
+        event.setStateProvider((random, pos) -> {
+            boolean isRoot = reader.isStateAtPosition(pos, TreeUtil::isRoot);
+            if(isRoot) {
+                return Blocks.ROOTED_DIRT.defaultBlockState();
+            }
+            return provider.getState(random, pos);
+        });
+    }
+
 
     public static void containerReady(Level level, SubLevelContainer container) {
         if(!(container instanceof ServerSubLevelContainer serverContainer)) {
