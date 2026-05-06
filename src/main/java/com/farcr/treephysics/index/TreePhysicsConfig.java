@@ -53,7 +53,7 @@ public class TreePhysicsConfig {
 
         GRAVITY_MULTIPLIER = builder
                 .comment("How much extra gravity should be applied to trees")
-                .defineInRange("gravity_multiplier", 2.0, 1.0, Double.MAX_VALUE);
+                .defineInRange("gravity_multiplier", 1.0, 1.0, Double.MAX_VALUE);
 
         GRAVITY_MULTIPLIER_TICKS = builder
                 .comment("How long in ticks the gravity multiplier should be applied. -1 for infinite")

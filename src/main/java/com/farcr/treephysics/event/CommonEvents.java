@@ -1,9 +1,9 @@
 package com.farcr.treephysics.event;
 
 import com.farcr.treephysics.TreePhysics;
+import com.farcr.treephysics.api.TreeUtil;
 import com.farcr.treephysics.api.manager.ServerTreeManager;
 import com.farcr.treephysics.api.manager.TreeSubLevelObserver;
-import com.farcr.treephysics.api.tree_gathering.TreeGatherer;
 import com.farcr.treephysics.client.TreeManager;
 import com.farcr.treephysics.index.TreePhysicsConfig;
 import dev.ryanhcode.sable.Sable;
@@ -68,7 +68,7 @@ public class CommonEvents {
             }
 
             if(!player.isShiftKeyDown()) {
-                List<ServerSubLevel> subLevels = TreeGatherer.trySplit((ServerLevel) event.getLevel(), pos);
+                List<ServerSubLevel> subLevels = TreeUtil.trySplit((ServerLevel) level, pos);
 
                 BlockPos belowPos = pos.below();
                 BlockState belowState = level.getBlockState(belowPos);
@@ -76,7 +76,6 @@ public class CommonEvents {
                     level.setBlock(belowPos, Blocks.DIRT.defaultBlockState(), 2);
                 }
 
-                if(subLevels == null || subLevels.isEmpty()) return;
                 if(!(brokenState.getBlock() instanceof RotatedPillarBlock) || brokenState.getValue(RotatedPillarBlock.AXIS) != Direction.Axis.Y) return;
 
                 for (ServerSubLevel subLevel : subLevels) {

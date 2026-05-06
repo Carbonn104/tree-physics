@@ -1,36 +1,28 @@
 package com.farcr.treephysics.api;
 
+import com.farcr.treephysics.api.flood_fill.TreeResult;
+import com.farcr.treephysics.api.flood_fill.TreeFloodFill;
+import com.farcr.treephysics.api.manager.ServerTreeManager;
+import com.farcr.treephysics.client.TreeManager;
 import com.farcr.treephysics.index.TreePhysicsTags;
-import com.farcr.treephysics.api.tree_gathering.TreeContext;
+import dev.ryanhcode.sable.api.SubLevelAssemblyHelper;
+import dev.ryanhcode.sable.companion.math.BoundingBox3i;
+import dev.ryanhcode.sable.sublevel.ServerSubLevel;
 import dev.ryanhcode.sable.sublevel.SubLevel;
 import net.minecraft.core.BlockPos;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.LeavesBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import org.joml.Vector3d;
 import org.joml.Vector3dc;
 
-public class TreeUtil {
-    public static final BlockPos[] DIRECTION_OFFSETS = new BlockPos[] {
-            new BlockPos(1, 0, 0),
-            new BlockPos(-1, 0, 0),
-            new BlockPos(0, 1, 0),
-            new BlockPos(0, -1, 0),
-            new BlockPos(0, 0, 1),
-            new BlockPos(0, 0, -1),
-            new BlockPos(1, 1, 0),
-            new BlockPos(-1, -1, 0),
-            new BlockPos(1, -1, 0),
-            new BlockPos(-1, 1, 0),
-            new BlockPos(1, 0, 1),
-            new BlockPos(-1, 0, -1),
-            new BlockPos(1, 0, -1),
-            new BlockPos(-1, 0, 1),
-            new BlockPos(0, 1, 1),
-            new BlockPos(0, -1, -1),
-            new BlockPos(0, -1, 1),
-            new BlockPos(0, 1, -1)
-    };
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
 
+public class TreeUtil {
     public static final BlockPos[] DIRECTION_OFFSETS_CORNERS = new BlockPos[] {
             new BlockPos(1, 0, 0),
             new BlockPos(-1, 0, 0),
@@ -65,29 +57,86 @@ public class TreeUtil {
 
     public static double getUprightness(SubLevel subLevel) {
         Vector3d direction = subLevel.logicalPose().transformNormal(DIRECTION.set(UP));
-        double value = Math.max(0, direction.dot(UP));
-        return value;
+        return Math.max(0, direction.dot(UP));
     }
 
-    public static boolean treeSpread(BlockState from, BlockState to, TreeContext context) {
-        if(context.isLog(from)) {
-            return context.isLog(to) || context.isLeaf(to) || to.is(TreePhysicsTags.STAYS_ON_TREE);
+    private static final TreeFloodFill TREE_VALIDATOR = new TreeFloodFill()
+            .addRule(TreeUtil::logRule)
+            .addTag(TreePhysicsTags.TREE);
+
+    private static final TreeFloodFill TREE_FINDER = new TreeFloodFill()
+            .addRule(TreeUtil::logRule)
+            .addRule(TreeUtil::leafRule)
+            .addRule(TreeUtil::attachmentRule)
+            .addRule(TreeUtil::fallingBlockRule)
+            .addTag(TreePhysicsTags.TREE)
+            .addTag(TreePhysicsTags.FALLS_FROM_TREES);
+
+    public static boolean isValidTree(BlockGetter blockGetter, BlockPos pos) {
+        TreeResult tree = TREE_VALIDATOR.findBlocks(blockGetter, pos);
+        return tree != null && tree.hasRoot();
+    }
+
+    public static List<ServerSubLevel> trySplit(ServerLevel level, BlockPos pos) {
+        if(!isValidTree(level, pos)) {
+            return List.of();
         }
 
-        if(context.isLeaf(from)) {
-            if(context.isLeaf(to)) {
-                int fromDistance = from.getValue(LeavesBlock.DISTANCE);
-                int toDistance = to.getValue(LeavesBlock.DISTANCE);
-                return fromDistance < toDistance;
-            } else {
-                return to.is(TreePhysicsTags.STAYS_ON_TREE);
+        TreeFloodFill floodFill = TREE_FINDER.ignore(pos);
+
+        List<ServerSubLevel> subLevels = new ArrayList<>();
+        ServerTreeManager manager = (ServerTreeManager) TreeManager.get(level);
+
+        for (BlockPos offset : DIRECTION_OFFSETS_CORNERS) {
+            BlockPos start = pos.offset(offset);
+
+            TreeResult tree = floodFill.findBlocks(level, start);
+
+            if(tree != null && !tree.hasRoot()) {
+                Set<BlockPos> treeBlocks = tree.getBlocks(TreePhysicsTags.TREE);
+                ServerSubLevel subLevel = SubLevelAssemblyHelper.assembleBlocks(level, pos, treeBlocks, new BoundingBox3i(pos, pos));
+                subLevels.add(subLevel);
+                manager.setTree(subLevel);
+
+                Set<BlockPos> fallingBlocks = tree.getBlocks(TreePhysicsTags.FALLS_FROM_TREES);
+                for (BlockPos blockPos : fallingBlocks) {
+                    SubLevelAssemblyHelper.assembleBlocks(level, blockPos, List.of(blockPos), new BoundingBox3i(blockPos, blockPos));
+                }
+
+                for (BlockPos blockPos : tree.getBlocks()) {
+                    level.setBlock(blockPos, Blocks.BARRIER.defaultBlockState(), 2);
+                    level.setBlock(blockPos, Blocks.AIR.defaultBlockState(), 2);
+                }
             }
+
+        }
+        return subLevels;
+    }
+
+    public static boolean logRule(BlockPos fromPos, BlockPos toPos, BlockState fromState, BlockState toState, TreeResult result) {
+        return result.isLog(fromState) && result.isLog(toState);
+    }
+
+    public static boolean leafRule(BlockPos fromPos, BlockPos toPos, BlockState fromState, BlockState toState, TreeResult result) {
+        if(result.isLog(fromState) && result.isLeaf(toState)) {
+            return true;
+        }
+
+        if(result.isLeaf(fromState) && result.isLeaf(toState)) {
+            int fromDistance = fromState.getValue(LeavesBlock.DISTANCE);
+            int toDistance = toState.getValue(LeavesBlock.DISTANCE);
+            return toDistance > fromDistance;
         }
 
         return false;
     }
 
-    public static boolean logSpread(BlockState from, BlockState to, TreeContext context) {
-        return context.isLog(from) && context.isLog(to);
+    public static boolean attachmentRule(BlockPos fromPos, BlockPos toPos, BlockState fromState, BlockState toState, TreeResult result) {
+        return !fromState.is(TreePhysicsTags.STAYS_ON_TREE) && toState.is(TreePhysicsTags.STAYS_ON_TREE);
     }
+
+    public static boolean fallingBlockRule(BlockPos fromPos, BlockPos toPos, BlockState fromState, BlockState toState, TreeResult result) {
+        return !fromState.is(TreePhysicsTags.FALLS_FROM_TREES) && toState.is(TreePhysicsTags.FALLS_FROM_TREES);
+    }
+
 }

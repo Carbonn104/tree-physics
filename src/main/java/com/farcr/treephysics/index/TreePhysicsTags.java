@@ -11,6 +11,7 @@ public class TreePhysicsTags {
     public static final TagKey<Block> PRODUCES_DUST_ON_IMPACT = create("produces_dust_on_impact");
     public static final TagKey<Block> FALLS_FROM_TREES = create("falls_from_trees");
     public static final TagKey<Block> ROOTS = create("roots");
+    public static final TagKey<Block> TREE = create("tree");
 
     private static TagKey<Block> create(String id) {
         return TagKey.create(Registries.BLOCK, path(id));
