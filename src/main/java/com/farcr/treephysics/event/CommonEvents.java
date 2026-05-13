@@ -109,51 +109,13 @@ public class CommonEvents {
     }
 
     @SubscribeEvent
-    public static void blockPlace(BlockEvent.EntityPlaceEvent event) {
-        LevelAccessor level = event.getLevel();
-        BlockPos pos = event.getPos();
-        ServerTreeManager manager = (ServerTreeManager) TreeManager.get((Level) level);
-        SubLevel subLevel = manager.getTree(pos);
-        if(subLevel != null) {
-            manager.updateTree(subLevel);
-        }
-    }
-
-    @SubscribeEvent
     public static void itemUseOnBlock(UseItemOnBlockEvent event) {
         BlockPos pos = event.getPos();
         SubLevel subLevel = Sable.HELPER.getContaining(event.getLevel(), pos);
         TreeManager treeManager = TreeManager.get(event.getLevel());
-        Level level = event.getLevel();
 
-        if(treeManager.isTree(subLevel)) {
-            boolean isWaxing = event.getUsePhase() == UseItemOnBlockEvent.UsePhase.ITEM_AFTER_BLOCK && event.getItemStack().is(Items.HONEYCOMB);
-            if(isWaxing) {
-                if(!event.getLevel().isClientSide()) {
-                    ServerTreeManager handler = (ServerTreeManager) treeManager;
-                    handler.unsetTree(subLevel);
-                } else {
-                    for (BlockPos blockPos : TreeUtil.plotIterator(subLevel)) {
-                        BlockState state = level.getBlockState(blockPos);
-                        if(!state.isAir()) {
-                            for (Direction direction : Direction.values()) {
-                                BlockState relative = level.getBlockState(blockPos.relative(direction));
-                                if(relative.isAir()) {
-                                    ParticleUtils.spawnParticlesOnBlockFace(level, blockPos, ParticleTypes.WAX_ON, UniformInt.of(1, 2), direction, () -> new Vec3(0, 0, 0), 0.55);
-                                }
-                            }
-                        }
-                    }
-                }
-
-                event.cancelWithResult(ItemInteractionResult.SUCCESS);
-                level.playSound(null, event.getPos(), SoundEvents.HONEYCOMB_WAX_ON, SoundSource.BLOCKS, 1.0f, 1.0f);
-                event.getItemStack().shrink(1);
-            } else {
-                if(!TreePhysicsConfig.CAN_BUILD.getAsBoolean()) {
-                    event.setCanceled(true);
-                }
-            }
+        if(treeManager instanceof ServerTreeManager serverTreeManager && treeManager.isTree(subLevel)) {
+            serverTreeManager.unsetTree(subLevel);
         }
     }
 

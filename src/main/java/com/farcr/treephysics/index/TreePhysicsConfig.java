@@ -7,7 +7,6 @@ public class TreePhysicsConfig {
 
     public static final ModConfigSpec.IntValue DESPAWN_TIME;
     public static final ModConfigSpec.EnumValue<DespawnBehavior> DESPAWN_BEHAVIOR;
-    public static final ModConfigSpec.BooleanValue CAN_BUILD;
     public static final ModConfigSpec.BooleanValue REQUIRES_AXE;
     public static final ModConfigSpec.BooleanValue CAN_WALK_THROUGH_LEAVES;
     public static final ModConfigSpec.DoubleValue LEAF_WALKING_SPEED;
@@ -33,10 +32,6 @@ public class TreePhysicsConfig {
                         "DESPAWN_ALL: Every tree will despawn"
                 )
                 .defineEnum("despawn_behavior", DespawnBehavior.DESPAWN_SMALL);
-
-        CAN_BUILD = builder
-                .comment("If trees can be built on")
-                .define("can_build", false);
 
         REQUIRES_AXE = builder
                 .comment("If an axe should be required to make tree sub-levels")
