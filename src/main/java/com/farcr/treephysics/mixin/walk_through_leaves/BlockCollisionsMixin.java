@@ -19,7 +19,7 @@ public class BlockCollisionsMixin {
 
     @WrapOperation(method = "computeNext", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/block/state/BlockState;getCollisionShape(Lnet/minecraft/world/level/BlockGetter;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/phys/shapes/CollisionContext;)Lnet/minecraft/world/phys/shapes/VoxelShape;"))
     private VoxelShape treephysics$getCollisionShape(BlockState instance, BlockGetter blockGetter, BlockPos pos, CollisionContext collisionContext, Operation<VoxelShape> original) {
-        if(TreePhysicsConfig.CAN_WALK_THROUGH_LEAVES.getAsBoolean() && instance.getBlock() instanceof LeavesBlock) {
+        if(TreePhysicsConfig.LEAF_WALKING_BEHAVIOR.get().allowWorld() && instance.getBlock() instanceof LeavesBlock) {
             return Shapes.empty();
         }
         return original.call(instance, blockGetter, pos, collisionContext);
