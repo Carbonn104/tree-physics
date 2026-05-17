@@ -21,13 +21,9 @@ import javax.annotation.Nullable;
 @Mixin(LevelRenderer.class)
 public class LevelRendererMixin {
 
-    @Shadow
-    @Nullable
-    private ClientLevel level;
-
     @WrapOperation(method = "levelEvent", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/multiplayer/ClientLevel;playLocalSound(Lnet/minecraft/core/BlockPos;Lnet/minecraft/sounds/SoundEvent;Lnet/minecraft/sounds/SoundSource;FFZ)V", ordinal = 41))
     private void treephysics$playLocalSound(ClientLevel instance, BlockPos pos, SoundEvent soundEvent, SoundSource soundSource, float volume, float pitch, boolean b, Operation<Void> original, @Local(name = "blockstate1") BlockState blockstate1) {
-        if(blockstate1.is(BlockTags.LEAVES)) {
+        if(blockstate1.is(BlockTags.LEAVES) && TreeManager.get(instance).isTree(pos)) {
             volume *= (float) TreePhysicsClientConfig.LEAF_VOLUME.getAsDouble();
         }
         original.call(instance, pos, soundEvent, soundSource, volume, pitch, b);

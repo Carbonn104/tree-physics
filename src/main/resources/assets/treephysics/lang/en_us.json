@@ -36,5 +36,8 @@
   "treephysics.config.physics.extra_push_multiplier": "Extra Push Multiplier",
   "treephysics.config.physics.extra_push_multiplier.tooltip": "How much extra pushing strength should be applied for upright trees",
   "treephysics.config.physics.static_leaf_collision": "Static Leaf Collision",
-  "treephysics.config.physics.static_leaf_collision.tooltip": "If leaves not on sub-levels should have collision"
+  "treephysics.config.physics.static_leaf_collision.tooltip": "If leaves not on sub-levels should have collision",
+
+  "treephysics.config.leaf_volume": "Leaf Volume",
+  "treephysics.config.leaf_volume.tooltip": "How loud the leaf breaking sound should be on trees"
 }
