@@ -243,12 +243,10 @@ public class ServerTreeManager extends SavedData implements TreeManager {
         for (TreeData data : treeData) {
             this.trees.put(data.subLevelId, data);
         }
-        System.out.println("trees loaded! " + treeData);
     }
 
     private ListTag saveTheTrees() {
         List<TreeData> values = this.trees.values().stream().toList();
-        System.out.println("trees saved! " + values);
         return (ListTag) TreeData.CODEC.listOf().encodeStart(NbtOps.INSTANCE, values).getOrThrow();
     }
 
