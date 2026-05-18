@@ -142,6 +142,7 @@ publishing {
 }
 
 publishMods {
+    dryRun = true
     def modrinthToken = project.findProperty("modrinthPublishToken") ?: ''
     def curseforgeToken = project.findProperty("curseforgePublishToken") ?: ''
     def changelogFile = rootProject.file("changelog.md")

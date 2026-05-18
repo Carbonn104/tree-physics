@@ -5,6 +5,7 @@ import com.farcr.treephysics.api.TreeUtil;
 import com.farcr.treephysics.api.manager.ServerTreeManager;
 import com.farcr.treephysics.api.manager.TreeSubLevelObserver;
 import com.farcr.treephysics.client.TreeManager;
+import com.farcr.treephysics.data.TreePhysicsLang;
 import com.farcr.treephysics.index.TreePhysicsCommands;
 import com.farcr.treephysics.index.TreePhysicsConfig;
 import com.mojang.brigadier.CommandDispatcher;
@@ -21,6 +22,7 @@ import net.minecraft.commands.CommandBuildContext;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.data.PackOutput;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.ItemTags;
@@ -35,6 +37,7 @@ import net.minecraft.world.level.levelgen.feature.treedecorators.TreeDecorator;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.neoforge.data.event.GatherDataEvent;
 import net.neoforged.neoforge.event.RegisterCommandsEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 import net.neoforged.neoforge.event.entity.player.UseItemOnBlockEvent;
@@ -133,6 +136,18 @@ public class CommonEvents {
         CommandBuildContext context = event.getBuildContext();
         CommandDispatcher<CommandSourceStack> dispatcher = event.getDispatcher();
         TreePhysicsCommands.registerCommands(context, dispatcher);
+    }
+
+    @EventBusSubscriber(modid = TreePhysics.MOD_ID)
+    public static class Mod {
+
+        @SubscribeEvent
+        public static void gatherData(GatherDataEvent event) {
+            if (event.includeClient()) {
+                PackOutput output = event.getGenerator().getPackOutput();
+                event.addProvider(new TreePhysicsLang(output));
+            }
+        }
     }
 
     public static void containerReady(Level level, SubLevelContainer container) {

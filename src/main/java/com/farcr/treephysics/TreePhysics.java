@@ -24,6 +24,7 @@ public class TreePhysics {
 
     public TreePhysics(IEventBus modEventBus, ModContainer modContainer) {
         NeoForge.EVENT_BUS.register(CommonEvents.class);
+        modEventBus.register(CommonEvents.Mod.class);
         SableEventPlatform.INSTANCE.onSubLevelContainerReady(CommonEvents::containerReady);
         SableEventPlatform.INSTANCE.onPostPhysicsTick(CommonEvents::postPhysicsTick);
         modContainer.registerConfig(ModConfig.Type.COMMON, TreePhysicsConfig.SPEC);

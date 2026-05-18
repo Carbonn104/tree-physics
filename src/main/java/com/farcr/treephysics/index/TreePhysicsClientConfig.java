@@ -2,6 +2,8 @@ package com.farcr.treephysics.index;
 
 import net.neoforged.neoforge.common.ModConfigSpec;
 
+import static com.farcr.treephysics.index.TreePhysicsConfig.create;
+
 public class TreePhysicsClientConfig {
     public static final ModConfigSpec SPEC;
 
@@ -10,9 +12,7 @@ public class TreePhysicsClientConfig {
     static {
         ModConfigSpec.Builder builder = new ModConfigSpec.Builder();
 
-        LEAF_VOLUME = builder
-                .comment("treephysics.config.leaf_volume.tooltip")
-                .translation("treephysics.config.leaf_volume")
+        LEAF_VOLUME = create(builder, "Leaf Volume", "How loud the leaf breaking sound should be on trees")
                 .defineInRange("leaf_volume", 0.15, 0.0, 1.0);
 
         SPEC = builder.build();
