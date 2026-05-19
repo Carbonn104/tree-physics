@@ -3,6 +3,7 @@
     "minecraft:bee_nest",
     "minecraft:cocoa",
     "minecraft:shroomlight",
+    "minecraft:mangrove_propagule",
     { "id": "nomansland:apple", "required": false },
     { "id": "nomansland:pear", "required": false }
   ]
