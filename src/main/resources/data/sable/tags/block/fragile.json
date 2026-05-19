@@ -1,5 +1,9 @@
 {
   "values": [
+    "minecraft:vine",
+    "minecraft:weeping_vines",
+    "minecraft:weeping_vines_plant",
+    "#minecraft:wart_blocks",
     "#treephysics:falls_from_trees",
     { "id": "nomansland:shelf_mushroom_block", "required": false }
   ]
