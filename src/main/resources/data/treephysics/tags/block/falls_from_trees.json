@@ -2,6 +2,7 @@
   "values": [
     "minecraft:bee_nest",
     "minecraft:cocoa",
+    "minecraft:shroomlight",
     { "id": "nomansland:apple", "required": false },
     { "id": "nomansland:pear", "required": false }
   ]
