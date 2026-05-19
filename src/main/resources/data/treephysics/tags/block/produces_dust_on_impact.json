@@ -1,5 +1,7 @@
 {
   "values": [
+    "#c:sandstone/blocks",
+    "#minecraft:soul_speed_blocks",
     "#minecraft:dirt",
     "#c:sands",
     "#c:stones",
