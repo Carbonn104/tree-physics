@@ -8,6 +8,7 @@ import dev.ryanhcode.sable.sublevel.entity_collision.SubLevelEntityCollision;
 import dev.ryanhcode.sable.util.LevelAccelerator;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.block.LeavesBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.shapes.Shapes;
@@ -23,12 +24,11 @@ public class SubLevelEntityCollisionMixin {
 
     @Inject(method = "getSubLevelEntityCollisionShape", at = @At("HEAD"), cancellable = true)
     private static void treephysics$getSubLevelEntityCollisionShape(Entity entity, Vector3dc boundsCenter, Pose3dc subLevelPose, BlockState state, LevelAccelerator level, BlockPos pos, LevelReusedVectors sink, CallbackInfoReturnable<VoxelShape> cir) {
-        boolean walkThroughLeaves = TreePhysicsConfig.LEAF_WALKING_BEHAVIOR.get().allowSubLevel() && state.getBlock() instanceof LeavesBlock;
+        boolean walkThroughLeaves = entity instanceof LivingEntity && TreePhysicsConfig.LEAF_WALKING_BEHAVIOR.get().allowSubLevel() && state.getBlock() instanceof LeavesBlock;
         boolean wasHit = entity instanceof LivingEntityExtension extension && extension.treephysics$wasHitByTree();
         if(walkThroughLeaves || wasHit) {
             cir.setReturnValue(Shapes.empty());
         }
-
     }
 
 }
